@@ -1,5 +1,5 @@
 movements = []
-with open('data/day02.txt') as file:
+with open('../data/2021/day02.txt') as file:
     for line in file.readlines():
         movements.append(line)
 

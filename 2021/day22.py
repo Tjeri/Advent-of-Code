@@ -68,7 +68,7 @@ class Cube:
         return [cube for cube in split if cube.size > 0]
 
 
-file_name = 'data/day22.txt'
+file_name = '../data/2021/day22.txt'
 with open(file_name) as file:
     data = file.readlines()
 

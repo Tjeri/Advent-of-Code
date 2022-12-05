@@ -1,5 +1,5 @@
 cave = []
-with open('data/day09.txt') as file:
+with open('../data/2021/day09.txt') as file:
     for line in file.readlines():
         cave.append([int(c) for c in line.strip()])
 

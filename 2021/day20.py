@@ -56,7 +56,7 @@ class Image:
         return self.enhancement_algorithm[int(pixels, 2)]
 
 
-file_name = 'data/day20.txt'
+file_name = '../data/2021/day20.txt'
 with open(file_name) as file:
     data = file.readlines()
 image = Image(data[0], data[2:])

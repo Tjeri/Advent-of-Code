@@ -21,7 +21,7 @@ completion_points = {
 
 error_score = 0
 completion_scores = []
-with open('data/day10.txt') as file:
+with open('../data/2021/day10.txt') as file:
     for line in file.readlines():
         expected_closing: list[str] = []
         for c in line.strip():

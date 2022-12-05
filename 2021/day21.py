@@ -56,7 +56,7 @@ class DiracDie:
         return False
 
 
-file_name = 'data/day21.txt'
+file_name = '../data/2021/day21.txt'
 with open(file_name) as file:
     data = file.readlines()
 

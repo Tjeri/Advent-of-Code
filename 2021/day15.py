@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-file_name = 'data/day15.txt'
+file_name = '../data/2021/day15.txt'
 
 
 @dataclass

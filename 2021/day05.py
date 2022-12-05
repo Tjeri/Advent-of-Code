@@ -60,7 +60,7 @@ class Line:
 
 result = set()
 covered_points = set()
-with open('data/day05.txt') as file:
+with open('../data/2021/day05.txt') as file:
     for _line in file.readlines():
         line = Line(_line)
         if not line.is_straight():
@@ -75,7 +75,7 @@ print(f'Part 1: {len(result)}')
 
 result = set()
 covered_points = set()
-with open('data/day05.txt') as file:
+with open('../data/2021/day05.txt') as file:
     for _line in file.readlines():
         line = Line(_line)
         for point in line.covered_points:

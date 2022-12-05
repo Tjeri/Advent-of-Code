@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from functools import reduce
 from typing import Type
 
-file_name = 'data/day16.txt'
+file_name = '../data/2021/day16.txt'
 
 with open(file_name) as file:
     data = file.readline()

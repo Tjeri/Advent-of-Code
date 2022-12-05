@@ -1,4 +1,4 @@
-file_name = 'data/day14.txt'
+file_name = '../data/2021/day14.txt'
 
 start = None
 rules: dict[str, str] = dict()

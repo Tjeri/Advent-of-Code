@@ -48,7 +48,7 @@ class SegmentDeduction:
 
 unique_lengths = {2, 3, 4, 7}
 count = 0
-with open('data/day08.txt') as file:
+with open('../data/2021/day08.txt') as file:
     for line in file.readlines():
         output = line[line.index(' | ') + 3:].strip()
         for segment in output.split(' '):
@@ -58,7 +58,7 @@ with open('data/day08.txt') as file:
 print(f'Part 1: {count}')
 
 segments = []
-with open('data/day08.txt') as file:
+with open('../data/2021/day08.txt') as file:
     for line in file.readlines():
         segments.append(SegmentDeduction(line.strip()))
 

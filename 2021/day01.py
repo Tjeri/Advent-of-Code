@@ -1,7 +1,7 @@
 from typing import Optional
 
 numbers = []
-with open('data/day01.txt') as file:
+with open('../data/2021/day01.txt') as file:
     for line in file.readlines():
         numbers.append(int(line))
 

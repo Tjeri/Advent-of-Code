@@ -1,6 +1,6 @@
 from typing import Optional
 
-file_name = 'data/day12.txt'
+file_name = '../data/2021/day12.txt'
 
 
 class Graph:

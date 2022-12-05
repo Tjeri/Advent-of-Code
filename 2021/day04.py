@@ -49,7 +49,7 @@ class BingoBoard:
         return unmarked_sum * self.last_number
 
 
-with open('data/day04.txt') as file:
+with open('../data/2021/day04.txt') as file:
     lines = file.readlines()
 
 numbers = [int(s) for s in lines[0].strip().split(',')]

@@ -1,4 +1,4 @@
-file_name = 'data/day13.txt'
+file_name = '../data/2021/day13.txt'
 
 dots: set[tuple[int, int]] = set()
 folds: list[tuple[str, int]] = list()

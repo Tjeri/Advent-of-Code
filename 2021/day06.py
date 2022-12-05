@@ -11,7 +11,7 @@ fish_map: dict[int, int] = {
     7: 0,
     8: 0
 }
-with open('data/day06.txt') as file:
+with open('../data/2021/day06.txt') as file:
     for fish_str in file.readline().split(','):
         fish = int(fish_str)
         fish_map[fish] += 1

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-file_name = 'data/day17.txt'
+file_name = '../data/2021/day17.txt'
 
 
 @dataclass

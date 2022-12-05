@@ -1,7 +1,7 @@
 pmin = 10000
 pmax = 0
 positions = []
-with open('data/day07.txt') as file:
+with open('../data/2021/day07.txt') as file:
     for pos_s in file.readline().split(','):
         pos = int(pos_s)
         if pos < pmin:

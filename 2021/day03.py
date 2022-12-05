@@ -1,6 +1,6 @@
 digits: int = 0
 diagnostics: list[str] = []
-with open('data/day03.txt') as file:
+with open('../data/2021/day03.txt') as file:
     for line in file.readlines():
         diagnostics.append(line.strip())
 digits = len(diagnostics[0])

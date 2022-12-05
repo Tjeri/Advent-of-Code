@@ -164,7 +164,7 @@ def build_tree(_data) -> Element:
     return pair
 
 
-file_name = 'data/day18.txt'
+file_name = '../data/2021/day18.txt'
 raw_numbers = []
 with open(file_name) as file:
     for line in file.readlines():

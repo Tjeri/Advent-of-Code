@@ -120,7 +120,7 @@ class Scanner:
         return result
 
 
-file_name = 'data/day19.txt'
+file_name = '../data/2021/day19.txt'
 need_overlap = 12
 scanners = []
 fill_scanner: Optional[Scanner] = None

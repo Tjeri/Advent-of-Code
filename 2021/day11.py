@@ -1,4 +1,4 @@
-path = 'data/day11.txt'
+path = '../data/2021/day11.txt'
 board_size = 10
 steps = 100
 
