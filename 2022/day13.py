@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import cmp_to_key
-from pprint import pprint
 
 
 def compare(left: list | int, right: list | int) -> bool | None:
