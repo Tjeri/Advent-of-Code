@@ -137,8 +137,8 @@ class BoardPosition:
     @property
     def score(self) -> int:
         # noinspection PyTypeChecker
-        return 1000 * (self.die_face.global_pos.y + self.position.y + 1) \
-            + 4 * (self.die_face.global_pos.x + self.position.x + 1) \
+        return 1000 * (self.global_position.y + 1) \
+            + 4 * (self.global_position.x + 1) \
             + self.direction.value
 
     def is_valid(self) -> bool:
