@@ -1,19 +1,6 @@
 from dataclasses import dataclass
-from typing import Any
 
-
-@dataclass
-class Point:
-    x: int
-    y: int
-
-    def __hash__(self) -> int:
-        return hash(f'{self.x}/{self.y}')
-
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Point):
-            return False
-        return self.x == other.x and self.y == other.y
+from aoc.coord2d.point import Point
 
 
 @dataclass

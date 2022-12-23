@@ -1,15 +1,8 @@
-from __future__ import annotations
-
 import math
-from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-
-@dataclass
-class Point:
-    x: int
-    y: int
+from aoc.coord2d.point import Point
 
 
 class Stone(Enum):

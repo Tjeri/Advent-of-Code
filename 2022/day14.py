@@ -1,35 +1,23 @@
 from __future__ import annotations
 
 from copy import copy
-from dataclasses import dataclass
 from typing import Generator
 
+from aoc.coord2d.point import Point
 
-@dataclass
-class Point:
-    x: int
-    y: int
 
-    def __hash__(self) -> int:
-        return hash((self.x, self.y))
+def point_range(start: Point, end: Point) -> Generator[Point, None, None]:
+    def _calc_step(_start: int, _end: int) -> int:
+        step = _end - _start
+        if step == 0:
+            step = 1
+        return step // abs(step)
 
-    def range_to(self, end: Point) -> Generator[Point, None, None]:
-        x_step = end.x - self.x
-        if x_step == 0:
-            x_step = 1
-        x_step = x_step // abs(x_step)
-        y_step = end.y - self.y
-        if y_step == 0:
-            y_step = 1
-        y_step = y_step // abs(y_step)
-        for y in range(self.y, end.y + y_step, y_step):
-            for x in range(self.x, end.x + x_step, x_step):
-                yield Point(x, y)
-
-    @staticmethod
-    def from_coord_str(coords: str) -> Point:
-        x, y = coords.split(',')
-        return Point(int(x), int(y))
+    x_step = _calc_step(start.x, end.x)
+    y_step = _calc_step(start.y, end.y)
+    for y in range(start.y, end.y + y_step, y_step):
+        for x in range(start.x, end.x + x_step, x_step):
+            yield Point(x, y)
 
 
 class Map:
@@ -50,7 +38,7 @@ class Map:
         return result
 
     def add_line(self, start: Point, end: Point) -> None:
-        for point in start.range_to(end):
+        for point in point_range(start, end):
             self.blocked.add(point)
             if point.y > self.lowest_blocked_y:
                 self.lowest_blocked_y = point.y

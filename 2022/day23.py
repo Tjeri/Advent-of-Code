@@ -1,48 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from enum import Enum, auto
 
-
-@dataclass
-class Point:
-    x: int
-    y: int
-
-    def __add__(self, other: Point) -> Point:
-        return Point(self.x + other.x, self.y + other.y)
-
-    def __hash__(self) -> int:
-        return hash(f'{self.x}/{self.y}')
-
-
-@dataclass
-class Rect:
-    top_left: Point
-    bottom_right: Point
-
-    @property
-    def width(self) -> int:
-        return self.bottom_right.x - self.top_left.x
-
-    @property
-    def height(self) -> int:
-        return self.bottom_right.y - self.top_left.y
-
-    def update(self, point: Point) -> None:
-        if point.x < self.top_left.x:
-            self.top_left.x = point.x
-        if point.y < self.top_left.y:
-            self.top_left.y = point.y
-        if point.x > self.bottom_right.x:
-            self.bottom_right.x = point.x
-        if point.y > self.bottom_right.y:
-            self.bottom_right.y = point.y
-
-
-class Tile(Enum):
-    Elf = '#'
-    Ground = '.'
+from aoc.coord2d.point import Point
+from aoc.coord2d.rect import Rect
 
 
 class Direction(Enum):

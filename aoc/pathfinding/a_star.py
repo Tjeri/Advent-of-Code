@@ -1,25 +1,8 @@
 from __future__ import annotations
 
-import heapq
-from typing import TypeVar, Generic, Any, Callable
+from typing import Any, Callable
 
-T = TypeVar('T')
-
-
-class PriorityQueue(Generic[T]):
-    elements: list[T]
-
-    def __init__(self) -> None:
-        self.elements = list()
-
-    def push(self, item: T, priority: float) -> None:
-        heapq.heappush(self.elements, (priority, item))
-
-    def pop(self) -> T:
-        return heapq.heappop(self.elements)[1]
-
-    def __bool__(self) -> bool:
-        return len(self.elements) > 0
+from aoc.data_structures.priority_queue import PriorityQueue
 
 
 class Node:

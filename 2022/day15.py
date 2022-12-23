@@ -1,36 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Generator
+
+from aoc.coord2d.point import Point
 
 
-@dataclass
-class Point:
-    x: int
-    y: int
-
-    def __hash__(self) -> int:
-        return hash((self.x, self.y))
-
-    @property
-    def tuning_frequency(self) -> int:
-        return 4_000_000 * self.x + self.y
-
-    def distance(self, other: Point) -> int:
-        return abs(self.x - other.x) + abs(self.y - other.y)
-
-    def range_to(self, end: Point) -> Generator[Point, None, None]:
-        x_step = end.x - self.x
-        if x_step == 0:
-            x_step = 1
-        x_step = x_step // abs(x_step)
-        y_step = end.y - self.y
-        if y_step == 0:
-            y_step = 1
-        y_step = y_step // abs(y_step)
-        for y in range(self.y, end.y + y_step, y_step):
-            for x in range(self.x, end.x + x_step, x_step):
-                yield Point(x, y)
+def tuning_frequency(point: Point) -> int:
+    return 4_000_000 * point.x + point.y
 
 
 @dataclass
@@ -54,7 +30,7 @@ class Sensor:
         return Sensor(Point(sensor_x, sensor_y), Point(beacon_x, beacon_y))
 
     def get_row_range(self, y: int, _min: int | None = None, _max: int | None = None) -> range | None:
-        distance_to_beacon = self.position.distance(self.beacon)
+        distance_to_beacon = self.position.manhattan_distance(self.beacon)
         distance_to_y = abs(self.position.y - y)
         if distance_to_y > distance_to_beacon:
             return None
@@ -68,7 +44,7 @@ class Sensor:
         return range(start_x, end_x + 1)
 
     def get_row_information(self, y: int, _min: int, _max: int) -> tuple[set[int], set[int]]:
-        distance_to_beacon = self.position.distance(self.beacon)
+        distance_to_beacon = self.position.manhattan_distance(self.beacon)
         distance_to_y = abs(self.position.y - y)
         if distance_to_y > distance_to_beacon:
             return set(), set()
@@ -108,14 +84,14 @@ def calculate_part_2(_min_coord: int, _max_coord: int) -> int:
         ranges = get_sorted_ranges(y, _min_coord, _max_coord)
         _min, _max = ranges[0].start, ranges[0].stop
         if _min > _min_coord:
-            return Point(_min_coord, y).tuning_frequency
+            return tuning_frequency(Point(_min_coord, y))
         for _range in ranges:
             if _range.start <= _max:
                 _max = max(_max, _range.stop)
             else:
-                return Point(_max, y).tuning_frequency
+                return tuning_frequency(Point(_max, y))
         if _max - 1 < _max_coord:
-            return Point(_max_coord, y).tuning_frequency
+            return tuning_frequency(Point(_max_coord, y))
     raise ValueError
 
 

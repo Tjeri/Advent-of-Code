@@ -4,14 +4,7 @@ import re
 from dataclasses import dataclass
 from enum import Enum, IntEnum
 
-
-@dataclass
-class Point:
-    x: int
-    y: int
-
-    def __add__(self, other: Point) -> Point:
-        return Point(self.x + other.x, self.y + other.y)
+from aoc.coord2d.point import Point
 
 
 class Square:

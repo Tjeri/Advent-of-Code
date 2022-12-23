@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from tools.a_star import Node, a_star
+from aoc.pathfinding.a_star import Node, a_star
 
 
 class HillNode(Node):

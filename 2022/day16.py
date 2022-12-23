@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import itertools
 
-from tools.a_star import Node, dijkstra
+from aoc.pathfinding.a_star import Node, dijkstra
 
 
 def read_valves() -> None:

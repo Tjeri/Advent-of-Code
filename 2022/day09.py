@@ -1,30 +1,6 @@
-from __future__ import annotations
-
 from copy import copy
-from dataclasses import dataclass
 
-
-@dataclass
-class Point:
-    x: int = 0
-    y: int = 0
-
-    def __add__(self, other: Point) -> Point:
-        return Point(self.x + other.x, self.y + other.y)
-
-    def __iadd__(self, other: Point) -> Point:
-        self.x += other.x
-        self.y += other.y
-        return self
-
-    def __sub__(self, other: Point) -> Point:
-        return Point(self.x - other.x, self.y - other.y)
-
-    def __copy__(self) -> Point:
-        return Point(self.x, self.y)
-
-    def __hash__(self) -> int:
-        return hash(f'{self.x}/{self.y}')
+from aoc.coord2d.point import Point
 
 
 def get_movement(direction: str) -> Point:
