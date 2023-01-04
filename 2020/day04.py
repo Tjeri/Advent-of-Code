@@ -1,3 +1,5 @@
+from aoc.input import read_split_input
+
 required_fields = {'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'}
 validators = {
     'byr': lambda byr: 1920 <= int(byr) <= 2002,
@@ -12,32 +14,35 @@ validators = {
 }
 
 
-# noinspection PyBroadException
-def validate_fields(_fields: dict[str, str]) -> bool:
-    try:
-        for key, value in _fields.items():
-            if not validators[key](value):
-                return False
-        return True
-    except Exception:
-        return False
+def read_passports(passport_lines: list[list[str]]) -> list[dict[str, str]]:
+    return [read_passport(lines) for lines in passport_lines]
 
 
-valid_1 = 0
-valid_2 = 0
-with open('../data/2020/day04.txt') as file:
-    fields = dict()
-    for line in file.readlines():
-        line = line.strip()
-        if line:
-            for _key, _value in map(lambda kv: kv.split(':'), line.split(' ')):
-                fields[_key] = _value
-        else:
-            if not required_fields - fields.keys():
-                valid_1 += 1
-                if validate_fields(fields):
-                    valid_2 += 1
-            fields = dict()
+def read_passport(lines: list[str]) -> dict[str, str]:
+    passport = dict()
+    for line in lines:
+        passport.update(map(lambda kv: kv.split(':'), line.split(' ')))
+    return passport
 
-print(f'Part 1: {valid_1}')
-print(f'Part 2: {valid_2}')
+
+def validate_passport_fields(passport: dict[str, str]) -> bool:
+    for key, value in passport.items():
+        if not validators[key](value):
+            return False
+    return True
+
+
+def count_valid_passports(passports: list[dict[str, str]]) -> tuple[int, int]:
+    all_required_fields = 0
+    actually_valid = 0
+    for passport in passports:
+        if not required_fields - passport.keys():
+            all_required_fields += 1
+            if validate_passport_fields(passport):
+                actually_valid += 1
+    return all_required_fields, actually_valid
+
+
+part1, part2 = count_valid_passports(read_passports(read_split_input()))
+print(f'Part 1: {part1}')
+print(f'Part 2: {part2}')

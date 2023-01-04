@@ -1,4 +1,4 @@
-numbers = []
+from aoc.input import read_input
 
 
 def check_numbers_1() -> int:
@@ -16,9 +16,6 @@ def check_numbers_2() -> int:
                     return numbers[i] * numbers[j] * numbers[k]
 
 
-with open('../data/2020/day01.txt') as file:
-    for line in file.readlines():
-        numbers.append(int(line.strip()))
-
+numbers = list(map(int, read_input()))
 print(f'Part 1: {check_numbers_1()}')
 print(f'Part 2: {check_numbers_2()}')

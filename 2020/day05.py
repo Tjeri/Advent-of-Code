@@ -1,3 +1,6 @@
+from aoc.input import read_input
+
+
 def get_seat_id(boarding_pass: str) -> int:
     min_row, max_row, min_col, max_col = 0, 127, 0, 7
     for char in boarding_pass:
@@ -12,11 +15,7 @@ def get_seat_id(boarding_pass: str) -> int:
     return min_row * 8 + min_col
 
 
-seats = []
-with open('../data/2020/day05.txt') as file:
-    for line in file.readlines():
-        seats.append(get_seat_id(line.strip()))
-
+seats = [get_seat_id(line) for line in read_input()]
 seats.sort()
 print(f'Part 1: {seats[-1]}')
 for i in range(0, len(seats) - 1):

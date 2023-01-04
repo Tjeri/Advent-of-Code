@@ -1,24 +1,20 @@
+from aoc.input import read_input
+
+
 class TreeMap:
     trees: list[list[bool]] = list()
     width: int = 0
     height: int = 0
 
-    def add_line(self, _line: str) -> None:
-        self.trees.append([char == '#' for char in _line])
-        if self.width == 0:
-            self.width = len(_line)
-        self.height += 1
+    def __init__(self, lines: list[str]) -> None:
+        self.trees = [[char == '#' for char in line] for line in lines]
+        self.width = len(lines[0])
+        self.height = len(lines)
 
     def is_tree(self, x: int, y: int) -> bool:
         if y >= self.height:
             return False
         return self.trees[y][x % self.width]
-
-
-tree_map = TreeMap()
-with open('../data/2020/day03.txt') as file:
-    for line in file.readlines():
-        tree_map.add_line(line.strip())
 
 
 def find_trees(slope_x: int, slope_y: int) -> int:
@@ -29,5 +25,6 @@ def find_trees(slope_x: int, slope_y: int) -> int:
     return trees
 
 
+tree_map = TreeMap(read_input())
 print(f'Part 1: {find_trees(3, 1)}')
 print(f'Part 2: {find_trees(1, 1) * find_trees(3, 1) * find_trees(5, 1) * find_trees(7, 1) * find_trees(1, 2)}')
