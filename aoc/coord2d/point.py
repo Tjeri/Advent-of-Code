@@ -54,5 +54,9 @@ class Point:
     def manhattan_distance(self, other: Point) -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)
 
-    def get_neighbors(self) -> list[Point]:
+    def get_direct_neighbors(self) -> list[Point]:
         return [self + Point(0, -1), self + Point(1, 0), self + Point(0, 1), self + Point(-1, 0)]
+
+    def get_all_neighbors(self) -> list[Point]:
+        return [self + Point(0, -1), self + Point(1, -1), self + Point(1, 0), self + Point(1, 1), self + Point(0, 1),
+                self + Point(-1, 1), self + Point(-1, 0), self + Point(-1, -1)]

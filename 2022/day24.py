@@ -76,7 +76,7 @@ def move(start: Point, end: Point, start_time: int) -> int:
         current_blizzards = get_blizzard_positions(minute)
         next_positions = set()
         for position in positions:
-            for neighbor in [position] + position.get_neighbors():
+            for neighbor in [position] + position.get_direct_neighbors():
                 if not is_oob(neighbor) and neighbor not in current_blizzards:
                     next_positions.add(neighbor)
         positions = next_positions
