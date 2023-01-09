@@ -11,7 +11,7 @@ class Rect:
     bottom_right: Point
 
     @classmethod
-    def from_width_and_height(cls, top_left: Point, width: int, height: int) -> Rect:
+    def from_size(cls, top_left: Point, width: int, height: int) -> Rect:
         return cls(top_left, top_left + Point(width, height))
 
     @property

@@ -11,8 +11,8 @@ class Point3D:
 
     @staticmethod
     def from_coord_str(coord_str: str) -> Point3D:
-        x, y = coord_str.split(',')
-        return Point3D(int(x), int(y))
+        x, y, z = coord_str.split(',')
+        return Point3D(int(x), int(y), int(z))
 
     def __add__(self, other: Point3D) -> Point3D:
         return Point3D(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -37,3 +37,12 @@ class Point3D:
 
     def __hash__(self) -> int:
         return hash(f'{self.x}/{self.y}/{self.z}')
+
+    def get_all_neighbors(self) -> list[Point3D]:
+        neighbors = []
+        for z in range(self.z - 1, self.z + 2):
+            for y in range(self.y - 1, self.y + 2):
+                for x in range(self.x - 1, self.x + 2):
+                    neighbors.append(Point3D(x, y, z))
+        neighbors.remove(self)
+        return neighbors
