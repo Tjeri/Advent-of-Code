@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import re
-import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Pattern
+from typing import Generator, Pattern
 
 from aoc.input import read_split_input
 
@@ -34,70 +33,44 @@ def collect_dependencies(rules: dict[int, tuple[set[int], str]]) -> dict[int | N
     return dependencies
 
 
-class RegexMatcher:
-    rules: list[Pattern[str]]
+def replace_regex_rule(rule: str, rules: dict[int, str]) -> str:
+    sides = rule.split(' | ')
+    replaced = []
+    for side in sides:
+        replaced.append(''.join([rules[int(_id)] for _id in side.split(' ')]))
+    return f'({"|".join(replaced)})'
 
-    def __init__(self) -> None:
-        self.rules = []
 
-    def parse_rules(self, rule_lines: list[str]) -> None:
-        unfinished_rules = collect_rules(rule_lines)
-        dependencies = collect_dependencies(unfinished_rules)
-        parsed_rules: dict[int, str] = {}
-        for rule_id in dependencies[None]:
-            parsed_rules[rule_id] = unfinished_rules[rule_id][1]
-            del unfinished_rules[rule_id]
-        del dependencies[None]
+def build_regex_pattern(rule_lines: list[str]) -> Pattern[str]:
+    unfinished_rules = collect_rules(rule_lines)
+    dependencies = collect_dependencies(unfinished_rules)
+    parsed_rules: dict[int, str] = {}
+    for rule_id in dependencies[None]:
+        parsed_rules[rule_id] = unfinished_rules[rule_id][1]
+        del unfinished_rules[rule_id]
+    del dependencies[None]
 
-        ready: list[int] = list(parsed_rules.keys())
-        while ready:
-            rule_id = ready.pop(0)
-            for depending in dependencies.get(rule_id, []):
-                depends_on, text = unfinished_rules[depending]
-                depends_on.remove(rule_id)
-                if not depends_on:
-                    del unfinished_rules[depending]
-                    rule = self._replace_rule(text, parsed_rules)
-                    self._add_rule(parsed_rules, depending, rule)
-                    ready.append(depending)
-        self.rules = [re.compile(rule) for rule in parsed_rules.values()]
-
-    def validate(self, message: str) -> bool:
-        for rule in self.rules:
-            if self._check_rule(message, rule):
-                return True
-        return False
-
-    def _add_rule(self, rules: dict[int, str], rule_id: int, rule: str) -> None:
-        rules[rule_id] = rule
-
-    def _check_rule(self, message: str, rule: Pattern[str]) -> bool:
-        return bool(re.fullmatch(rule, message))
-
-    @staticmethod
-    def _replace_rule(rule: str, rules: dict[int, str]) -> str:
-        sides = rule.split(' | ')
-        replaced = []
-        for side in sides:
-            replaced.append(''.join([rules[int(_id)] for _id in side.split(' ')]))
-        return f'({"|".join(replaced)})'
+    ready: list[int] = list(parsed_rules.keys())
+    while ready:
+        rule_id = ready.pop(0)
+        for depending in dependencies.get(rule_id, []):
+            depends_on, text = unfinished_rules[depending]
+            depends_on.remove(rule_id)
+            if not depends_on:
+                del unfinished_rules[depending]
+                rule = replace_regex_rule(text, parsed_rules)
+                parsed_rules[depending] = rule
+                ready.append(depending)
+    return re.compile(parsed_rules.get(0))
 
 
 class Matcher(ABC):
     @abstractmethod
-    def matches(self, text: str) -> tuple[bool, int]:
+    def matches(self, text: str) -> Generator[int, None, None]:
         pass
 
-    @abstractmethod
     def fully_matches(self, text: str) -> bool:
-        pass
-
-    @abstractmethod
-    def get_all_matches(self, text: str) -> list[int]:
-        pass
-
-    def get_full_matches(self, text: str) -> list[int]:
-        return [match for match in self.get_all_matches(text) if match == len(text)]
+        return any(match for match in self.matches(text) if match == len(text))
 
     @staticmethod
     def parse_rules(rule_lines: list[str], use_recursive: bool = False) -> dict[int, Matcher]:
@@ -148,74 +121,34 @@ class Matcher(ABC):
 class StringMatcher(Matcher):
     match: str
 
-    def matches(self, text: str) -> tuple[bool, int]:
-        return text.startswith(self.match), len(self.match)
-
-    def fully_matches(self, text: str) -> bool:
-        return text == self.match
-
-    def get_all_matches(self, text: str) -> list[int]:
-        return [len(self.match)] if text.startswith(self.match) else []
+    def matches(self, text: str) -> Generator[int, None, None]:
+        if text.startswith(self.match):
+            yield len(self.match)
 
 
 @dataclass
 class ConcatMatcher(Matcher):
     matchers: list[Matcher]
 
-    def matches(self, text: str) -> tuple[bool, int]:
-        index = 0
-        for matcher in self.matchers:
-            matches, consumes = matcher.matches(text[index:])
-            if not matches:
-                return False, 0
-            index += consumes
-        return True, index
+    def matches(self, text: str) -> Generator[int, None, None]:
+        yield from self.matches_inner(0, text)
 
-    def fully_matches(self, text: str) -> bool:
-        matches, consumes = self.matches(text)
-        return matches and len(text) == consumes
-
-    def get_all_matches(self, text: str) -> list[int]:
-        matches = self.matchers[0].get_all_matches(text)
-        if not matches:
-            return []
-        for matcher in self.matchers[1:]:
-            new_matches = []
-            for old_match in matches:
-                matcher_matches = matcher.get_all_matches(text[old_match:])
-                new_matches += [old_match + new_match for new_match in matcher_matches]
-            if not new_matches:
-                return []
-            matches = new_matches
-        return matches
+    def matches_inner(self, index: int, text: str) -> Generator[int, None, None]:
+        if index >= len(self.matchers):
+            yield 0
+            return
+        for match in self.matchers[index].matches(text):
+            for next_match in self.matches_inner(index + 1, text[match:]):
+                yield match + next_match
 
 
 @dataclass
 class OrMatcher(Matcher):
     matchers: list[Matcher]
 
-    def matches(self, text: str) -> tuple[bool, int]:
+    def matches(self, text: str) -> Generator[int, None, None]:
         for matcher in self.matchers:
-            matches, consumes = matcher.matches(text)
-            if matches:
-                return matches, consumes
-        return False, 0
-
-    def fully_matches(self, text: str) -> bool:
-        for matcher in self.matchers:
-            matches, consumes = matcher.matches(text)
-            if matches and consumes == len(text):
-                return True
-        return False
-
-    def get_all_matches(self, text: str) -> list[int]:
-        matches = []
-        for matcher in self.matchers:
-            matches += matcher.get_all_matches(text)
-        return matches
-
-    def get_full_matches(self, text: str) -> list[int]:
-        return [match for match in self.get_all_matches(text) if match == len(text)]
+            yield from matcher.matches(text)
 
 
 class RecursiveMatcher8(Matcher):
@@ -224,14 +157,8 @@ class RecursiveMatcher8(Matcher):
     def __init__(self, matcher: Matcher) -> None:
         self.matcher = OrMatcher([matcher, ConcatMatcher([matcher, self])])
 
-    def matches(self, text: str) -> tuple[bool, int]:
-        return self.matcher.matches(text)
-
-    def fully_matches(self, text: str) -> bool:
-        return self.matcher.fully_matches(text)
-
-    def get_all_matches(self, text: str) -> list[int]:
-        return self.matcher.get_all_matches(text)
+    def matches(self, text: str) -> Generator[int, None, None]:
+        yield from self.matcher.matches(text)
 
 
 class RecursiveMatcher11(Matcher):
@@ -242,28 +169,17 @@ class RecursiveMatcher11(Matcher):
             raise ValueError
         self.matcher = OrMatcher([matcher, ConcatMatcher([matcher.matchers[0], self, matcher.matchers[1]])])
 
-    def matches(self, text: str) -> tuple[bool, int]:
-        return self.matcher.matches(text)
-
-    def fully_matches(self, text: str) -> bool:
-        return self.matcher.fully_matches(text)
-
-    def get_all_matches(self, text: str) -> list[int]:
-        return self.matcher.get_all_matches(text)
+    def matches(self, text: str) -> Generator[int, None, None]:
+        yield from self.matcher.matches(text)
 
 
 def part1_regex(rules_lines: list[str], messages: list[str]) -> int:
-    matcher = RegexMatcher()
-    matcher.parse_rules(rules_lines)
-    matching = 0
-    for message in messages:
-        if matcher.validate(message):
-            matching += 1
-    return matching
+    pattern = build_regex_pattern(rules_lines)
+    return sum(int(bool(re.fullmatch(pattern, message))) for message in messages)
 
 
 def part1_custom(rules_line: list[str], messages: list[str]) -> int:
-    matcher = OrMatcher(list(Matcher.parse_rules(rules_line).values()))
+    matcher = Matcher.parse_rules(rules_line)[0]
     matching = 0
     for message in messages:
         if matcher.fully_matches(message):
@@ -272,10 +188,10 @@ def part1_custom(rules_line: list[str], messages: list[str]) -> int:
 
 
 def part2_custom(rules_line: list[str], messages: list[str]) -> int:
-    matcher = OrMatcher(list(Matcher.parse_rules(rules_line, True).values()))
+    matcher = Matcher.parse_rules(rules_line, True)[0]
     matching = 0
     for message in messages:
-        if matcher.get_full_matches(message):
+        if matcher.fully_matches(message):
             matching += 1
     return matching
 
