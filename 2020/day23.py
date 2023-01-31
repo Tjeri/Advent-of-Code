@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from aoc.data_structures.linked_list import LinkedListElement, LoopingUniqueLinkedList, UniqueLinkedList
+from aoc.data_structures.looping_list import LoopingList
 from aoc.input import read_input
 
 
-class CrabCups:
+class CrabCupsSlow:
     cups: list[int]
     index: int = 0
     max: int
@@ -57,15 +57,20 @@ class CrabCups:
         return self.cups.index(label)
 
 
-class CrabCups2:
-    cups: LoopingUniqueLinkedList[int]
-    current: LinkedListElement[int]
+class CrabCupsFast:
+    cups: LoopingList[int]
+    current: int
     max: int
 
     def __init__(self, line: str) -> None:
-        self.cups = LoopingUniqueLinkedList(map(int, line))
-        self.current = self.cups.first
-        self.max = max(self.cups).value
+        self.cups = LoopingList(map(int, line))
+        self.current = self.cups.start
+        self.max = max(self.cups)
+
+    @property
+    def order(self) -> list[int]:
+        self.cups.rotate(1)
+        return list(self.cups)
 
     def setup_part_2(self) -> None:
         self.cups.extend(range(self.max + 1, 1_000_001))
@@ -73,35 +78,33 @@ class CrabCups2:
 
     @property
     def elements2(self) -> tuple[int, int]:
-        one = self.cups.get(1)
-        return one.next_element.value, one.next_element.next_element.value
+        one = self.cups.element(1)
+        return one.next.value, one.next.next.value
 
     def simulate(self, moves: int) -> None:
         for i in range(moves):
-            if i % 100_000 == 0:
-                print(i)
             self.make_move()
 
     def make_move(self) -> None:
-        removed_cups = self.cups.extract_from(self.current.next_element, 3)
-        destination = self.find_destination(self.current.value - 1, removed_cups)
-        self.cups.insert_list_after(destination, removed_cups, keep_elements=True)
-        self.current = self.current.next_element
+        removed_cups = self.cups.remove_multiple_after(self.current, 3)
+        destination = self.find_destination(self.current - 1, removed_cups)
+        self.cups.extend_after(removed_cups, after=destination)
+        self.current = self.cups.next(self.current)
 
-    def find_destination(self, label: int, removed: UniqueLinkedList[int]) -> LinkedListElement[int]:
+    def find_destination(self, label: int, removed: list[int]) -> int:
         if label <= 0:
             label = self.max
         if label in removed:
             return self.find_destination(label - 1, removed)
-        return self.cups.get(label)
+        return label
 
 
-_line = read_input(False)[0]
-game = CrabCups(_line)
+_line = read_input()[0]
+game = CrabCupsFast(_line)
 game.simulate(100)
 part1 = ''.join(map(str, game.order[1:]))
 print(f'Part 1: {part1}')
-game = CrabCups2(_line)
+game = CrabCupsFast(_line)
 game.setup_part_2()
 game.simulate(10_000_000)
 elements = game.elements2

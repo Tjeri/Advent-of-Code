@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from _ast import In
 from typing import Any, Generator, Generic, Hashable, Iterable, Reversible, TypeVar
 
 T = TypeVar('T', bound=Hashable)
