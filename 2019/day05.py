@@ -1,4 +1,4 @@
-from aoc.incode_computer import IntcodeComputer
+from incode_computer import IntcodeComputer
 from aoc.input import read_input
 
 _lines = read_input()

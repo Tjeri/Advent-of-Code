@@ -37,6 +37,9 @@ class Point:
         self.y *= times
         return self
 
+    def __rmul__(self, other: int) -> Point:
+        return self * other
+
     def __mod__(self, other: Point) -> Point:
         return Point(self.x % other.x, self.y % other.y)
 

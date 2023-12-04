@@ -22,6 +22,10 @@ class Rect:
     def height(self) -> int:
         return self.bottom_right.y - self.top_left.y
 
+    @property
+    def middle(self) -> Point:
+        return self.top_left + Point(self.width // 2, self.height // 2)
+
     def update(self, point: Point) -> None:
         if point.x < self.top_left.x:
             self.top_left.x = point.x
@@ -31,6 +35,9 @@ class Rect:
             self.bottom_right.x = point.x
         if point.y > self.bottom_right.y:
             self.bottom_right.y = point.y
+
+    def __contains__(self, item: Point) -> bool:
+        return self.top_left.x <= item.x <= self.bottom_right.x and self.top_left.y <= item.y <= self.bottom_right.y
 
 
 @dataclass

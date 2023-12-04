@@ -1,6 +1,6 @@
 import itertools
 
-from aoc.incode_computer import IntcodeComputer, State
+from incode_computer import IntcodeComputer
 from aoc.input import read_input
 
 
@@ -12,7 +12,7 @@ def amplify(program: list[int], phase_setting_sequence: tuple[int, ...], feedbac
         value = computers[i].output[-1]
     if not feedback_loop:
         return value
-    while computers[-1].state is State.Input:
+    while not computers[-1].state.finishing:
         for computer in computers:
             computer.run([value])
             value = computer.output[-1]

@@ -32,6 +32,18 @@ class Point3D:
         self.z -= other.z
         return self
 
+    def __mul__(self, times: int) -> Point3D:
+        return Point3D(times * self.x, times * self.y, times * self.z)
+
+    def __imul__(self, times: int) -> Point3D:
+        self.x *= times
+        self.y *= times
+        self.z *= times
+        return self
+
+    def __rmul__(self, other: int) -> Point3D:
+        return self * other
+
     def __copy__(self) -> Point3D:
         return Point3D(self.x, self.y, self.z)
 

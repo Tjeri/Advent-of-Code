@@ -21,6 +21,7 @@ class State(IntEnum):
 class ParameterMode(IntEnum):
     Position = 0
     Immediate = 1
+    Relative = 2
 
     @staticmethod
     def parse_modes(digits: str) -> list[ParameterMode]:
@@ -37,12 +38,13 @@ class OpCode(IntEnum):
     JumpIfFalse = 6
     LessThan = 7
     Equals = 8
+    RelativeBaseOffset = 9
 
     Exit = 99
 
 
 class IntcodeComputer:
-    memory: list[int]
+    memory: dict[int, int]
     input: Iterator[int]
     output: list[int]
     debug: bool
@@ -51,11 +53,12 @@ class IntcodeComputer:
     position: int = 0
     opcode: OpCode = OpCode.Null
     parameter_modes: list[ParameterMode]
+    relative_base: int = 0
 
     __opcodes: dict[OpCode, Callable[[], None]]
 
     def __init__(self, program: list[int], *, debug: bool = False) -> None:
-        self.memory = program.copy()
+        self.memory = {i: value for i, value in enumerate(program)}
         self.debug = debug
 
         self.input = iter([])
@@ -71,8 +74,22 @@ class IntcodeComputer:
             OpCode.JumpIfTrue: self.jump_if_true,
             OpCode.JumpIfFalse: self.jump_if_false,
             OpCode.LessThan: self.less_than,
-            OpCode.Equals: self.is_equal
+            OpCode.Equals: self.is_equal,
+            OpCode.RelativeBaseOffset: self.adjust_relative_base
         }
+
+    def copy(self) -> IntcodeComputer:
+        copy = IntcodeComputer([0])
+        copy.memory = self.memory.copy()
+        copy.input = iter([])
+        copy.output = self.output.copy()
+        copy.debug = self.debug
+        copy.state = self.state
+        copy.position = self.position
+        copy.opcode = self.opcode
+        copy.parameter_modes = self.parameter_modes.copy()
+        copy.relative_base = copy.relative_base
+        return copy
 
     def replace(self, position: int, value: int) -> IntcodeComputer:
         self.memory[position] = value
@@ -93,7 +110,7 @@ class IntcodeComputer:
             if self.state == State.Input:
                 return
 
-            if not self.state.finishing and self.position >= len(self.memory):
+            if not self.state.finishing and self.position not in self.memory:
                 self.debug_print('program over')
                 self.state = State.Over
 
@@ -130,24 +147,34 @@ class IntcodeComputer:
         position = self.next_position()
         parameter_mode = self.next_parameter_mode()
         if parameter_mode == ParameterMode.Position:
-            self.debug_print(f'Read Pos {self.memory[position]} as {self.memory[self.memory[position]]}')
-            return self.memory[self.memory[position]]
+            result = self.memory.get(self.memory.get(position, 0), 0)
+            self.debug_print(f'Read Pos {self.memory.get(position, 0)} as {result}')
+            return result
         if parameter_mode == ParameterMode.Immediate:
-            self.debug_print(f'Read Pos {position} directly as {self.memory[position]}')
-            return self.memory[position]
+            result = self.memory.get(position, 0)
+            self.debug_print(f'Read Pos {position} directly as {result}')
+            return result
+        if parameter_mode == ParameterMode.Relative:
+            result = self.memory.get(self.memory.get(position, 0) + self.relative_base, 0)
+            self.debug_print(f'Read Pos {position} relative as {result} (relative base {self.relative_base})')
+            return result
         raise NotImplementedError(f'Parameter Mode {parameter_mode} not implemented.')
 
     def set(self, value: int) -> None:
         position = self.next_position()
         parameter_mode = self.next_parameter_mode()
         if parameter_mode == ParameterMode.Position:
-            self.debug_print(f'Write Pos {self.memory[position]}: {value}')
-            self.memory[self.memory[position]] = value
+            real_position = self.memory.get(position, 0)
+            self.debug_print(f'Write Pos {real_position}: {value}')
         elif parameter_mode == ParameterMode.Immediate:
+            real_position = position
             self.debug_print(f'Write Pos {position} directly: {value}')
-            self.memory[position] = value
+        elif parameter_mode == ParameterMode.Relative:
+            real_position = self.memory.get(position, 0) + self.relative_base
+            self.debug_print(f'Write Pos {real_position} relative: {value} (relative base {self.relative_base})')
         else:
             raise NotImplementedError(f'Parameter Mode {parameter_mode} not implemented.')
+        self.memory[real_position] = value
 
     def add(self) -> None:
         result = self.get() + self.get()
@@ -197,3 +224,27 @@ class IntcodeComputer:
         is_equal = self.get() == self.get()
         self.debug_print('Equals')
         self.set(1 if is_equal else 0)
+
+    def adjust_relative_base(self) -> None:
+        self.debug_print('Adjust relative base')
+        self.relative_base += self.get()
+
+
+class AsciiIntcodeComputer(IntcodeComputer):
+    auto_add_newline: bool
+
+    def __init__(self, program: list[int], auto_add_newline: bool = True, *, debug: bool = False) -> None:
+        super().__init__(program, debug=debug)
+        self.auto_add_newline = auto_add_newline
+
+    @property
+    def str_output(self) -> str:
+        return ''.join([chr(num) for num in self.output])
+
+    def run(self, str_input: str | None = None) -> None:
+        if str_input is None:
+            super().run()
+            return
+        if self.auto_add_newline and not str_input.endswith('\n'):
+            str_input += '\n'
+        super().run([ord(char) for char in str_input])

@@ -17,6 +17,7 @@ file_path = base_path / f'day{day.zfill(2)}.py'
 if not file_path.exists():
     with open(file_path, 'x') as file:
         file.write('from aoc.input import read_input\n\n_lines = read_input(False)\n')
+(base_path / 'data').mkdir(exist_ok=True)
 data_path = base_path / 'data' / file_path.stem
 data_path.mkdir(exist_ok=True)
 sample_path = data_path / 'sample'

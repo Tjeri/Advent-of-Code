@@ -2,14 +2,17 @@ import traceback
 from pathlib import Path
 
 
-def read_input(real_input: bool = True, sample_id: str | None = None) -> list[str]:
-    path = find_file(real_input, sample_id, -3)
+def read_input(real_input: bool = True, file_id: str | int | None = None, strip_whitespace: bool = True) -> list[str]:
+    path = find_file(real_input, file_id, -3)
     with open(path) as file:
-        return [line.strip() for line in file]
+        if strip_whitespace:
+            return [line.strip() for line in file]
+        else:
+            return [line.strip('\n').strip('\r') for line in file]
 
 
-def read_split_input(real_input: bool = True, sample_id: str | None = None) -> list[list[str]]:
-    path = find_file(real_input, sample_id, -3)
+def read_split_input(real_input: bool = True, file_id: str | int | None = None) -> list[list[str]]:
+    path = find_file(real_input, file_id, -3)
     with open(path) as file:
         return split_lines([line.strip() for line in file])
 
@@ -29,12 +32,11 @@ def split_lines(lines: list[str]) -> list[list[str]]:
     return result
 
 
-def find_file(real_input: bool = True, sample_id: str | None = None, stack_pos: int = -2) -> Path:
+def find_file(real_input: bool = True, file_id: str | int | None = None, stack_pos: int = -2) -> Path:
     stack = traceback.extract_stack()
     file = Path(stack[stack_pos].filename)
     data_path = file.parent / 'data' / file.stem
-    if real_input:
-        return data_path / 'input'
-    if not sample_id:
-        return data_path / 'sample'
-    return data_path / f'sample_{sample_id}'
+    file_name = 'input' if real_input else 'sample'
+    if file_id is not None:
+        file_name += f'_{file_id}'
+    return data_path / file_name
