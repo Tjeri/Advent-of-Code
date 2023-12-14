@@ -21,7 +21,7 @@ def parse_map(lines: list[str]) -> dict[str, tuple[str, str]]:
     return result
 
 
-def find_cycle(start: str, mapping: dict[str, tuple[str, str]], directions: cycle) -> int:
+def find_end(start: str, mapping: dict[str, tuple[str, str]], directions: cycle) -> int:
     steps = 0
     position = start
     while not position.endswith('Z'):
@@ -31,11 +31,11 @@ def find_cycle(start: str, mapping: dict[str, tuple[str, str]], directions: cycl
 
 
 def part2(mapping: dict[str, tuple[str, str]], directions: cycle) -> int:
-    cycles = [find_cycle(key, mapping, directions) for key in mapping.keys() if key.endswith('A')]
+    cycles = [find_end(key, mapping, directions) for key in mapping.keys() if key.endswith('A')]
     return lcm(*cycles)
 
 
 _lines = read_input(True)
 _mapping = parse_map(_lines)
-print(f'Part 1: {find_cycle("AAA", _mapping, parse_directions(_lines))}')
+print(f'Part 1: {find_end("AAA", _mapping, parse_directions(_lines))}')
 print(f'Part 2: {part2(_mapping, parse_directions(_lines))}')
