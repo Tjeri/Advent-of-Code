@@ -63,3 +63,6 @@ class Point:
     def get_all_neighbors(self) -> list[Point]:
         return [self + Point(0, -1), self + Point(1, -1), self + Point(1, 0), self + Point(1, 1), self + Point(0, 1),
                 self + Point(-1, 1), self + Point(-1, 0), self + Point(-1, -1)]
+
+    def cross_product(self, other: Point) -> int:
+        return self.x * other.y - other.x * self.y
