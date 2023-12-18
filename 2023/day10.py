@@ -3,6 +3,7 @@ from __future__ import annotations
 from enum import Enum
 
 from aoc.input import read_input
+from aoc.pathfinding.flooding import flood
 from aoc.utils.list import flatten
 
 
@@ -58,19 +59,6 @@ def get_start_direction(lines: list[str] | list[list[str]], x: int, y: int, dist
         raise ValueError('Start only connected to 1 pipe.')
 
 
-def get_adjacent(lines: list[list[str]], x: int, y: int) -> list[tuple[int, int]]:
-    result = []
-    if y > 0:
-        result.append((x, y - 1))
-    if y < len(lines) - 1:
-        result.append((x, y + 1))
-    if x > 0:
-        result.append((x - 1, y))
-    if x < len(lines[y]) - 1:
-        result.append((x + 1, y))
-    return result
-
-
 def part1(lines: list[str]) -> int:
     start_x, start_y = find_start(lines)
     direction = get_start_direction(lines, start_x, start_y)
@@ -112,7 +100,7 @@ def part2(lines: list[str]) -> int:
         for x, char in enumerate(line):
             check.append((x, y))
 
-    part2_check(lines, check)
+    flood(lines, {'#'}, '0')
 
     result = 0
     for line in lines:
@@ -120,18 +108,6 @@ def part2(lines: list[str]) -> int:
             if char not in ('#', '0', '*'):
                 result += 1
     return result
-
-
-def part2_check(lines: list[list[str]], check: list[tuple[int, int]]):
-    while check:
-        x, y = check.pop(0)
-        char = lines[y][x]
-        if char in ('#', '0'):
-            continue
-        adjacent = get_adjacent(lines, x, y)
-        if len(adjacent) < 4 or '0' in (lines[_y][_x] for _x, _y in adjacent):
-            lines[y][x] = '0'
-            check += adjacent
 
 
 _lines = read_input(True)
