@@ -12,15 +12,15 @@ class Rect:
 
     @classmethod
     def from_size(cls, top_left: Point, width: int, height: int) -> Rect:
-        return cls(top_left, top_left + Point(width, height))
+        return cls(top_left, top_left + Point(width - 1, height - 1))
 
     @property
     def width(self) -> int:
-        return self.bottom_right.x - self.top_left.x
+        return self.bottom_right.x - self.top_left.x + 1
 
     @property
     def height(self) -> int:
-        return self.bottom_right.y - self.top_left.y
+        return self.bottom_right.y - self.top_left.y + 1
 
     @property
     def middle(self) -> Point:
