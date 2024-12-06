@@ -20,7 +20,7 @@ class Direction(Enum):
         elif self == Direction.West:
             return Direction.North
 
-_lines = read_input(False)
+_lines = read_input(True)
 height = len(_lines)
 width = len(_lines[0])
 walls = set()
@@ -40,21 +40,16 @@ def find_visited_or_loop(extra_walls):
     obstacles = 0
     while True:
         _next = (g[0] + gd.value[0], g[1] + gd.value[1])
-        if _next in walls:
+        if _next in walls or _next in extra_walls:
             gd = gd.next()
             continue
-        elif _next in extra_walls:
-            _gdn = gd.next()
-            __next = (g[0] + _gdn.value[0], g[1] + _gdn.value[1])
-            if __next in visited and _gdn in vd[__next]:
-                print(extra_walls)
-                return set()
-            return visited
         if _next[0] < 0 or _next[1] < 0 or _next[0] >= width or _next[1] >= height:
             break
         g = _next
+        if gd in vd.setdefault(g, set()):
+            return set()
         visited.add(g)
-        vd.setdefault(g, set()).add(gd)
+        vd[g].add(gd)
     return visited
 
 _visited = find_visited_or_loop(set())
