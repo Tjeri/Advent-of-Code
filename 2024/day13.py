@@ -63,23 +63,35 @@ def solve2_solver(ax, ay, bx, by, px, py) -> int:
     return best
 
 
+def solve2_maths(ax, ay, bx, by, px, py) -> int:
+    px += 10_000_000_000_000
+    py += 10_000_000_000_000
+    b = (px * ay - py * ax) / (bx * ay - by * ax)
+    if int(b) != b:
+        return 0
+    a = (px - b * bx) / ax
+    if int(a) != a:
+        return 0
+    return int(3 * a + b)
+
+
 button_pattern = 'Button {:l}: X+{x:d}, Y+{y:d}'
 prize_pattern = 'Prize: X={x:d}, Y={y:d}'
 _blocks = read_split_input(True)
 part1 = 0
-part2 = 0
-part22 = 0
+part2_solver = 0
+part2_search = 0
+part2_maths = 0
 for block in _blocks:
     _a = parse(button_pattern, block[0], evaluate_result=int)
     _b = parse(button_pattern, block[1], evaluate_result=int)
     prize = parse(prize_pattern, block[2], evaluate_result=int)
     part1 += solve(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
-    part2 += solve2_solver(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
-    part22 += solve2_naive(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
-    if (_1 := solve2_solver(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])) != (_2 := solve2_naive(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])):
-        print(_1)
-        solve2_solver(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
-        solve2_naive(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
+    part2_solver += solve2_solver(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
+    part2_search += solve2_naive(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
+    part2_maths += solve2_maths(_a.named['x'], _a.named['y'], _b.named['x'], _b.named['y'], prize.named['x'], prize.named['y'])
+
 print('Part 1:', part1)
-print('Part 2:', part2)
-print('Part 2:', part22)
+print('Part 2 - solver:', part2_solver)
+print('Part 2 - search:', part2_search)
+print('Part 2 - maths :', part2_maths)
