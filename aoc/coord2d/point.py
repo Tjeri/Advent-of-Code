@@ -13,6 +13,9 @@ class Point:
         x, y = coord_str.split(',')
         return Point(int(x), int(y))
 
+    def __neg__(self) -> Point:
+        return Point(-self.x, -self.y)
+
     def __add__(self, other: Point) -> Point:
         return Point(self.x + other.x, self.y + other.y)
 
@@ -53,6 +56,9 @@ class Point:
 
     def __hash__(self) -> int:
         return hash((self.x, self.y))
+
+    def __lt__(self, other: Point) -> bool:
+        return self.x < other.x or self.x == other.x and self.y < other.y
 
     def manhattan_distance(self, other: Point) -> int:
         return abs(self.x - other.x) + abs(self.y - other.y)
