@@ -50,7 +50,8 @@ def part1(lines: list[str]) -> float:
 
 def part2(lines: list[str]) -> int:
     start, end, positions = parse_map(lines)
-    _, paths = dijkstra_all_shortest_paths((start, Point(1, 0)), lambda node: node[0] == end, create_neighbors_function(positions))
+    _, paths = dijkstra_all_shortest_paths((start, Point(1, 0)), lambda node: node[0] == end,
+                                           create_neighbors_function(positions))
     positions = set()
     for path in paths:
         for position, direction in path:
