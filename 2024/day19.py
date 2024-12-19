@@ -2,6 +2,7 @@ from functools import cache
 
 from aoc.input import read_split_input
 
+
 @cache
 def is_possible(string: str) -> bool:
     if string == '':
@@ -10,6 +11,7 @@ def is_possible(string: str) -> bool:
         if string.startswith(option) and is_possible(string[len(option):]):
             return True
     return False
+
 
 @cache
 def get_combinations(string: str) -> int:
