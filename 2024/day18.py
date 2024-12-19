@@ -21,12 +21,16 @@ def part2(points: list[Point]) -> Point:
     start = Point(0, 0)
     goal = Point(width - 1, height - 1)
     size = Rect(start, goal)
-    walls = set(points[:take])
-    for point in points[take:]:
-        walls.add(point)
+    lower = take
+    upper = len(points)
+    while upper - lower > 1:
+        mid = (upper + lower) // 2
+        walls = set(points[:mid])
         if len(dijkstra(start, lambda x: x == goal, neighbors)[1]) == 0:
-            return point
-
+            upper = mid
+        else:
+            lower = mid
+    return points[lower]
 
 
 real_input = True
