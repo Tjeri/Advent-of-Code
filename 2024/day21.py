@@ -20,7 +20,6 @@ keymap = {
     '<': Point(0, 4),
     'v': Point(1, 4),
     '>': Point(2, 4)
-
 }
 direction_to_str = {
     Point(1, 0): '>',
