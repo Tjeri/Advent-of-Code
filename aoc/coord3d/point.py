@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import sqrt
 
 
 @dataclass
@@ -49,6 +50,16 @@ class Point3D:
 
     def __hash__(self) -> int:
         return hash(f'{self.x}/{self.y}/{self.z}')
+
+    def manhattan_distance(self, other: Point3D) -> int:
+        return abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z)
+
+    def euclidean_distance(self, other: Point3D) -> float:
+        return sqrt(
+            abs(self.x - other.x) ** 2
+            + abs(self.y - other.y) ** 2
+            + abs(self.z - other.z) ** 2
+        )
 
     def get_all_neighbors(self) -> list[Point3D]:
         neighbors = []
