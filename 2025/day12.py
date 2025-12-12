@@ -41,3 +41,4 @@ for _line in _blocks[-1]:
     if Area(_line).fits_very_naive(_shapes):
         part1_naive += 1
 print(f'Part 1 (naive): {part1_naive}')
+print(f'Part 1 (oneline): {sum(1 if int(line[:line.index('x')]) * int(line[line.index('x') + 1:line.index(':')]) > 7 * sum(map(int, line[line.index(':') + 2:].split(' '))) else 0 for line in read_split_input(True)[-1])}')
